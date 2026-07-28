@@ -1,0 +1,250 @@
+# ===================================================
+# Linear Regression using Gradient Descent and Normal Equation
+# California Housing Dataset
+# ===================================================
+
+
+# ---------------------------------------------------
+# Import Required Libraries
+# ---------------------------------------------------
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+
+
+
+# ---------------------------------------------------
+# Task 1: Load and Preprocess Dataset
+# ---------------------------------------------------
+
+housing = fetch_california_housing(as_frame=True)
+
+df = housing.frame
+
+
+print("First Five Rows:")
+print(df.head())
+
+
+
+# Selecting one feature - Average Rooms
+
+X = df[['AveRooms']].values
+
+y = df['MedHouseVal'].values.reshape(-1,1)
+
+
+
+# Train-Test Split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+
+
+# Feature Scaling for Gradient Descent
+
+scaler = StandardScaler()
+
+X_train_scaled = scaler.fit_transform(X_train)
+
+X_test_scaled = scaler.transform(X_test)
+
+
+
+# ===================================================
+# Task 2: Linear Regression using Gradient Descent
+# ===================================================
+
+
+# Add bias term
+
+X_train_gd = np.c_[np.ones((len(X_train_scaled),1)), X_train_scaled]
+
+
+# Initialize parameters
+
+theta = np.zeros((2,1))
+
+
+# Hyperparameters
+
+learning_rate = 0.01
+
+iterations = 1000
+
+
+m = len(X_train_gd)
+
+
+
+# Gradient Descent
+
+for i in range(iterations):
+
+    predictions = X_train_gd.dot(theta)
+
+    gradients = (2/m) * X_train_gd.T.dot(predictions - y_train)
+
+    theta = theta - learning_rate * gradients
+
+
+
+print("\nGradient Descent Parameters")
+
+print("Intercept:", theta[0][0])
+
+print("Coefficient:", theta[1][0])
+
+
+
+# Prediction
+
+X_test_gd = np.c_[np.ones((len(X_test_scaled),1)), X_test_scaled]
+
+y_pred_gd = X_test_gd.dot(theta)
+
+
+
+
+# ===================================================
+# Task 3: Linear Regression using Normal Equation
+# ===================================================
+
+
+# Add bias term
+
+X_train_ne = np.c_[np.ones((len(X_train),1)), X_train]
+
+X_test_ne = np.c_[np.ones((len(X_test),1)), X_test]
+
+
+
+# Normal Equation
+
+theta_ne = np.linalg.pinv(
+    X_train_ne.T.dot(X_train_ne)
+).dot(
+    X_train_ne.T
+).dot(
+    y_train
+)
+
+
+
+print("\nNormal Equation Parameters")
+
+print("Intercept:", theta_ne[0][0])
+
+print("Coefficient:", theta_ne[1][0])
+
+
+
+# Prediction
+
+y_pred_ne = X_test_ne.dot(theta_ne)
+
+
+
+
+# ===================================================
+# Task 4: Model Evaluation
+# ===================================================
+
+
+print("\nGradient Descent Performance")
+
+print(
+    "MSE:",
+    mean_squared_error(y_test,y_pred_gd)
+)
+
+print(
+    "R2 Score:",
+    r2_score(y_test,y_pred_gd)
+)
+
+
+
+print("\nNormal Equation Performance")
+
+print(
+    "MSE:",
+    mean_squared_error(y_test,y_pred_ne)
+)
+
+print(
+    "R2 Score:",
+    r2_score(y_test,y_pred_ne)
+)
+
+
+
+
+# ===================================================
+# Task 5: Visualization
+# ===================================================
+
+
+plt.figure(figsize=(8,6))
+
+
+# Actual data points
+
+plt.scatter(
+    X_test,
+    y_test,
+    color="blue",
+    alpha=0.5,
+    label="Actual Data"
+)
+
+
+
+# Sort values for line
+
+sorted_index = np.argsort(X_test[:,0])
+
+
+X_sorted = X_test[sorted_index]
+
+y_sorted = y_pred_ne[sorted_index]
+
+
+
+# Regression line
+
+plt.plot(
+    X_sorted,
+    y_sorted,
+    color="red",
+    linewidth=2,
+    label="Regression Line"
+)
+
+
+
+plt.xlabel("Average Rooms per Household")
+
+plt.ylabel("Median House Value")
+
+plt.title(
+    "Linear Regression on California Housing Dataset"
+)
+
+
+plt.legend()
+
+plt.grid(True)
+
+plt.show()
