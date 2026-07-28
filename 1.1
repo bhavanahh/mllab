@@ -1,0 +1,261 @@
+# ===================================================
+# Linear Regression using Gradient Descent and Normal Equation
+# California Housing Dataset
+# ===================================================
+
+
+# ---------------------------------------------------
+# Import Required Libraries
+# ---------------------------------------------------
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+
+
+
+# ---------------------------------------------------
+# Task 1: Load and Preprocess the Dataset
+# ---------------------------------------------------
+
+# Load California Housing Dataset
+
+housing = fetch_california_housing(as_frame=True)
+
+df = housing.frame
+
+
+# Display first five rows
+
+print("First Five Rows:")
+print(df.head())
+
+
+
+# Select single feature (Average number of rooms)
+
+X = df[['AveRooms']].values
+
+y = df['MedHouseVal'].values.reshape(-1,1)
+
+
+
+# Split dataset into training and testing sets
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+
+
+# Feature Scaling for Gradient Descent
+
+scaler = StandardScaler()
+
+X_train_scaled = scaler.fit_transform(X_train)
+
+X_test_scaled = scaler.transform(X_test)
+
+
+
+# ---------------------------------------------------
+# Task 2: Linear Regression using Gradient Descent
+# ---------------------------------------------------
+
+
+# Add bias term
+
+X_b = np.c_[np.ones((len(X_train_scaled),1)), X_train_scaled]
+
+
+
+# Initialize parameters
+
+theta = np.zeros((2,1))
+
+
+
+# Hyperparameters
+
+learning_rate = 0.01
+
+iterations = 1000
+
+
+
+# Number of training samples
+
+m = len(X_train_scaled)
+
+
+
+# Gradient Descent Algorithm
+
+for i in range(iterations):
+
+    predictions = X_b.dot(theta)
+
+    gradients = (2/m) * X_b.T.dot(predictions - y_train)
+
+    theta = theta - learning_rate * gradients
+
+
+
+# Display Gradient Descent Parameters
+
+print("\nGradient Descent Parameters")
+
+print("Intercept:", theta[0][0])
+
+print("Coefficient:", theta[1][0])
+
+
+
+# Predictions using Gradient Descent
+
+X_test_b = np.c_[np.ones((len(X_test_scaled),1)), X_test_scaled]
+
+y_pred_gd = X_test_b.dot(theta)
+
+
+
+
+# ---------------------------------------------------
+# Task 3: Linear Regression using Normal Equation
+# ---------------------------------------------------
+
+
+# Add bias term without scaling
+
+X_train_ne = np.c_[np.ones((len(X_train),1)), X_train]
+
+X_test_ne = np.c_[np.ones((len(X_test),1)), X_test]
+
+
+
+# Normal Equation
+
+theta_ne = np.linalg.inv(
+    X_train_ne.T.dot(X_train_ne)
+).dot(
+    X_train_ne.T
+).dot(
+    y_train
+)
+
+
+
+# Display Normal Equation Parameters
+
+print("\nNormal Equation Parameters")
+
+print("Intercept:", theta_ne[0][0])
+
+print("Coefficient:", theta_ne[1][0])
+
+
+
+# Predictions using Normal Equation
+
+y_pred_ne = X_test_ne.dot(theta_ne)
+
+
+
+
+# ---------------------------------------------------
+# Task 4: Evaluate Model Performance
+# ---------------------------------------------------
+
+
+print("\nGradient Descent Performance")
+
+print(
+    "MSE :",
+    mean_squared_error(y_test, y_pred_gd)
+)
+
+print(
+    "R² Score :",
+    r2_score(y_test, y_pred_gd)
+)
+
+
+
+print("\nNormal Equation Performance")
+
+print(
+    "MSE :",
+    mean_squared_error(y_test, y_pred_ne)
+)
+
+print(
+    "R² Score :",
+    r2_score(y_test, y_pred_ne)
+)
+
+
+
+
+# ---------------------------------------------------
+# Task 5: Visualization of Regression Line
+# ---------------------------------------------------
+
+
+plt.figure(figsize=(8,6))
+
+
+
+# Actual Data Points
+
+plt.scatter(
+    X_test,
+    y_test,
+    color='blue',
+    alpha=0.5,
+    label="Actual Data"
+)
+
+
+
+# Sorting values for smooth line
+
+sorted_index = X_test[:,0].argsort()
+
+
+
+# Regression Line
+
+plt.plot(
+    X_test[sorted_index],
+    y_pred_ne[sorted_index],
+    color='red',
+    linewidth=2,
+    label="Regression Line"
+)
+
+
+
+# Labels and Title
+
+plt.xlabel("Average Rooms per Household")
+
+plt.ylabel("Median House Value")
+
+plt.title(
+    "Linear Regression on California Housing Dataset"
+)
+
+
+plt.legend()
+
+plt.grid(True)
+
+plt.show()
