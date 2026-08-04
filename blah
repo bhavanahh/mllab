@@ -190,3 +190,59 @@ client_socket.send("Hello Client! Message received.".encode())
 # Close connections
 client_socket.close()
 server.close()
+
+Your notes are correct. Here's a clean version you can use for your lab record or exam:
+
+DNS Query Message
+
+Protocol: UDP
+
+Destination Port: 53 (DNS Standard Port)
+
+Source Port: Random/Ephemeral (varies for each request)
+
+Transaction ID: Used to match the DNS query with its corresponding response.
+
+
+DNS Flags
+
+QR (Query/Response) Bit
+
+0 → Query Message
+
+1 → Response Message
+
+
+
+Response-only Flags
+
+AA (Authoritative Answer): Indicates the response is from an authoritative DNS server.
+
+RA (Recursion Available): Indicates the server supports recursive queries.
+
+RCODE (Response Code): Indicates whether the query was successful or the type of error.
+
+
+DNS Records in the Query Message
+
+Question Records: 1
+
+Answer Records: 0
+
+Authority Records: 0
+
+Additional Records: 0
+
+
+DNS Records in the Response Message
+
+Question Records: 1
+
+Answer Records: 0
+
+Authority Records: 1
+
+Additional Records: 0
+
+
+These points match the information shown in your screenshots and are suitable for viva or record writing.
