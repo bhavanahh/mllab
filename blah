@@ -1,0 +1,192 @@
+Here is the text content from your screenshots:
+
+
+---
+
+1. Python Socket Server Program (server.py)
+
+import socket
+
+# Create socket
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Bind to IP address and port
+server.bind(("localhost", 5000))
+
+# Listen for incoming connections
+server.listen(1)
+
+print("Server is waiting for a connection...")
+
+# Accept client connection
+client_socket, client_address = server.accept()
+print("Connected to:", client_address)
+
+# Receive data from client
+message = client_socket.recv(1024).decode()
+print("Client:", message)
+
+# Send reply to client
+client_socket.send("Hello Client! Message received.".encode())
+
+# Close connections
+client_socket.close()
+server.close()
+
+
+---
+
+(i) Which bit in the flag field determines whether the message is a query or response?
+
+Answer:
+
+The QR bit (Query/Response bit) determines whether the message is:
+
+Query (0)
+
+Response (1)
+
+
+
+---
+
+(j) Which bits are used only in the response message? What is the function of these bits in the response message?
+
+Response messages mainly use:
+
+Bit	Function
+
+AA	Authoritative Answer
+RA	Recursion Available
+RCODE	Response/Error code
+
+
+Functions
+
+AA → Indicates authoritative DNS server.
+
+RA → Server supports recursive queries.
+
+RCODE → Indicates success or error.
+
+
+
+---
+
+(k) How many question records, answer records, authority records, and additional records are present in the query message?
+
+Answer:
+
+Question Records: 1
+
+Answer Records: 0
+
+Authority Records: 0
+
+Additional Records: 0
+
+
+Expand: Domain Name System (DNS)
+
+
+---
+
+(l) How many question records, answer records, authority records, and additional records are present in the response message?
+
+Answer:
+
+Question Records: 1
+
+Answer Records: 0
+
+Authority Records: 1
+
+Additional Records: 0
+server
+import socket
+
+# Create socket
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Bind to IP address and port
+server.bind(("localhost", 5000))
+
+# Listen for incoming connections
+server.listen(1)
+
+print("Server is waiting for a connection...")
+
+# Accept client connection
+client_socket, client_address = server.accept()
+print("Connected to:", client_address)
+
+# Receive data from client
+message = client_socket.recv(1024).decode()
+print("Client:", message)
+
+# Send reply to client
+client_socket.send("Hello Client! Message received.".encode())
+
+# Close connections
+client_socket.close()
+server.close()
+client
+
+
+import socket
+
+# Create socket
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Connect to server
+client.connect(("localhost", 5000))
+
+# Send message to server
+client.send("Hello Server!".encode())
+
+# Receive reply from server
+reply = client.recv(1024).decode()
+print("Server:", reply)
+
+# Close connection
+client.close()
+
+
+
+notes
+
+
+import socket
+# Create socket
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Connect to server
+client.connect(("localhost", 5000))
+# Send message
+client.send("Hello Server!".encode())
+# Receive reply
+reply = client.recv(1024).decode()
+print("Server:", reply)
+# Close connection
+client.close()
+
+server 
+
+mport socket
+# Create socket
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Bind to IP address and port
+server.bind(("localhost", 5000))
+# Listen for incoming connections
+server.listen(1)
+print("Server is waiting for a connection...")
+# Accept client connection
+client_socket, client_address = server.accept()
+print("Connected to:", client_address)
+# Receive data from client
+message = client_socket.recv(1024).decode()
+print("Client:", message)
+# Send reply to client
+client_socket.send("Hello Client! Message received.".encode())
+# Close connections
+client_socket.close()
+server.close()
