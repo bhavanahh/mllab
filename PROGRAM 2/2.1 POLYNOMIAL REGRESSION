@@ -1,47 +1,65 @@
-# ===================================================
-# Linear Regression using Gradient Descent and Normal Equation
-# California Housing Dataset
-# ===================================================
+# PROGRAM NO. 2 – POLYNOMIAL REGRESSION
 
+**Roll No: 56**
 
-# ---------------------------------------------------
-# Import Required Libraries
-# ---------------------------------------------------
+## AIM
 
-import numpy as np
+To implement polynomial regression on the Auto MPG dataset to predict Miles Per Gallon (MPG) based on engine displacement and compare polynomial regression results with linear regression.
+
+## ALGORITHM
+
+1. Import the required Python libraries such as Pandas, NumPy, Matplotlib, and Scikit-learn.
+2. Load the `auto-mpg.csv` dataset using Pandas.
+3. Replace missing values represented by `?` with `NaN` and remove rows containing missing values.
+4. Convert the `displacement` column into floating-point values.
+5. Select `displacement` as the input feature `X` and `mpg` as the target variable `y`.
+6. Split the dataset into training and testing sets using an 80:20 ratio.
+7. Train a Linear Regression model using the training data.
+8. Calculate the Mean Squared Error (MSE) and R-squared score for the Linear Regression model.
+9. Create Polynomial Features of degree 2 and train a Polynomial Regression model.
+10. Create Polynomial Features of degree 3 and train another Polynomial Regression model.
+11. Calculate MSE and R-squared scores for both polynomial regression models.
+12. Compare the Linear Regression, Degree 2 Polynomial Regression, and Degree 3 Polynomial Regression models.
+13. Plot the actual data points and the Degree 2 polynomial regression curve.
+14. Save and display the polynomial regression graph.
+
+## PROGRAM
+
+```python
+# ------------------------------------------------------------
+# Import required libraries
+# ------------------------------------------------------------
+
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn.datasets import fetch_california_housing
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import StandardScaler
 
 
+# ------------------------------------------------------------
+# Task 1: Load and Preprocess the Dataset
+# ------------------------------------------------------------
 
-# ---------------------------------------------------
-# Task 1: Load and Preprocess Dataset
-# ---------------------------------------------------
+data = pd.read_csv("auto-mpg.csv")
 
-housing = fetch_california_housing(as_frame=True)
+data.replace("?", np.nan, inplace=True)
+data.dropna(inplace=True)
 
-df = housing.frame
+print(data.columns)
 
-
-print("First Five Rows:")
-print(df.head())
-
-
-
-# Selecting one feature - Average Rooms
-
-X = df[['AveRooms']].values
-
-y = df['MedHouseVal'].values.reshape(-1,1)
+data["displacement"] = data["displacement"].astype(float)
 
 
+# ------------------------------------------------------------
+# Task 2: Split the Dataset
+# ------------------------------------------------------------
 
-# Train-Test Split
+X = data[["displacement"]]
+y = data["mpg"]
 
 X_train, X_test, y_train, y_test = train_test_split(
     X,
@@ -51,200 +69,142 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 
+# ------------------------------------------------------------
+# Task 3: Linear Regression
+# ------------------------------------------------------------
 
-# Feature Scaling for Gradient Descent
+linear_model = LinearRegression()
 
-scaler = StandardScaler()
+linear_model.fit(X_train, y_train)
 
-X_train_scaled = scaler.fit_transform(X_train)
+y_pred_linear = linear_model.predict(X_test)
 
-X_test_scaled = scaler.transform(X_test)
+linear_mse = mean_squared_error(y_test, y_pred_linear)
+linear_r2 = r2_score(y_test, y_pred_linear)
 
-
-
-# ===================================================
-# Task 2: Linear Regression using Gradient Descent
-# ===================================================
-
-
-# Add bias term
-
-X_train_gd = np.c_[np.ones((len(X_train_scaled),1)), X_train_scaled]
+print("\nLinear Regression")
+print("-----------------")
+print("MSE:", linear_mse)
+print("R2 Score:", linear_r2)
 
 
-# Initialize parameters
+# ------------------------------------------------------------
+# Task 4: Polynomial Regression - Degree 2
+# ------------------------------------------------------------
 
-theta = np.zeros((2,1))
+poly2 = PolynomialFeatures(degree=2)
 
+X_train_poly2 = poly2.fit_transform(X_train)
+X_test_poly2 = poly2.transform(X_test)
 
-# Hyperparameters
+poly_model2 = LinearRegression()
 
-learning_rate = 0.01
+poly_model2.fit(X_train_poly2, y_train)
 
-iterations = 1000
+y_pred_poly2 = poly_model2.predict(X_test_poly2)
 
-
-m = len(X_train_gd)
-
-
-
-# Gradient Descent
-
-for i in range(iterations):
-
-    predictions = X_train_gd.dot(theta)
-
-    gradients = (2/m) * X_train_gd.T.dot(predictions - y_train)
-
-    theta = theta - learning_rate * gradients
+poly2_mse = mean_squared_error(y_test, y_pred_poly2)
+poly2_r2 = r2_score(y_test, y_pred_poly2)
 
 
+# ------------------------------------------------------------
+# Task 5: Polynomial Regression - Degree 3
+# ------------------------------------------------------------
 
-print("\nGradient Descent Parameters")
+poly3 = PolynomialFeatures(degree=3)
 
-print("Intercept:", theta[0][0])
+X_train_poly3 = poly3.fit_transform(X_train)
+X_test_poly3 = poly3.transform(X_test)
 
-print("Coefficient:", theta[1][0])
+poly_model3 = LinearRegression()
 
+poly_model3.fit(X_train_poly3, y_train)
 
+y_pred_poly3 = poly_model3.predict(X_test_poly3)
 
-# Prediction
-
-X_test_gd = np.c_[np.ones((len(X_test_scaled),1)), X_test_scaled]
-
-y_pred_gd = X_test_gd.dot(theta)
-
-
-
-
-# ===================================================
-# Task 3: Linear Regression using Normal Equation
-# ===================================================
+poly3_mse = mean_squared_error(y_test, y_pred_poly3)
+poly3_r2 = r2_score(y_test, y_pred_poly3)
 
 
-# Add bias term
+# ------------------------------------------------------------
+# Task 6: Compare the Models
+# ------------------------------------------------------------
 
-X_train_ne = np.c_[np.ones((len(X_train),1)), X_train]
+comparison = pd.DataFrame({
+    "Model": [
+        "Linear Regression",
+        "Polynomial Regression (Degree 2)",
+        "Polynomial Regression (Degree 3)"
+    ],
+    "MSE": [
+        round(linear_mse, 2),
+        round(poly2_mse, 2),
+        round(poly3_mse, 2)
+    ],
+    "R2 Score": [
+        round(linear_r2, 2),
+        round(poly2_r2, 2),
+        round(poly3_r2, 2)
+    ]
+})
 
-X_test_ne = np.c_[np.ones((len(X_test),1)), X_test]
+print("\nModel Comparison")
+print("----------------")
+print(comparison)
 
 
+# ------------------------------------------------------------
+# Task 7: Visualization
+# ------------------------------------------------------------
 
-# Normal Equation
-
-theta_ne = np.linalg.pinv(
-    X_train_ne.T.dot(X_train_ne)
-).dot(
-    X_train_ne.T
-).dot(
-    y_train
+X_plot = pd.DataFrame(
+    np.linspace(
+        X["displacement"].min(),
+        X["displacement"].max(),
+        300
+    ),
+    columns=["displacement"]
 )
 
+X_plot_poly2 = poly2.transform(X_plot)
 
+y_plot = poly_model2.predict(X_plot_poly2)
 
-print("\nNormal Equation Parameters")
-
-print("Intercept:", theta_ne[0][0])
-
-print("Coefficient:", theta_ne[1][0])
-
-
-
-# Prediction
-
-y_pred_ne = X_test_ne.dot(theta_ne)
-
-
-
-
-# ===================================================
-# Task 4: Model Evaluation
-# ===================================================
-
-
-print("\nGradient Descent Performance")
-
-print(
-    "MSE:",
-    mean_squared_error(y_test,y_pred_gd)
-)
-
-print(
-    "R2 Score:",
-    r2_score(y_test,y_pred_gd)
-)
-
-
-
-print("\nNormal Equation Performance")
-
-print(
-    "MSE:",
-    mean_squared_error(y_test,y_pred_ne)
-)
-
-print(
-    "R2 Score:",
-    r2_score(y_test,y_pred_ne)
-)
-
-
-
-
-# ===================================================
-# Task 5: Visualization
-# ===================================================
-
-
-plt.figure(figsize=(8,6))
-
-
-# Actual data points
+plt.figure(figsize=(8, 6))
 
 plt.scatter(
-    X_test,
-    y_test,
+    X["displacement"],
+    y,
     color="blue",
-    alpha=0.5,
     label="Actual Data"
 )
 
-
-
-# Sort values for line
-
-sorted_index = np.argsort(X_test[:,0])
-
-
-X_sorted = X_test[sorted_index]
-
-y_sorted = y_pred_ne[sorted_index]
-
-
-
-# Regression line
-
 plt.plot(
-    X_sorted,
-    y_sorted,
+    X_plot["displacement"],
+    y_plot,
     color="red",
     linewidth=2,
-    label="Regression Line"
+    label="Polynomial Regression (Degree 2)"
 )
 
-
-
-plt.xlabel("Average Rooms per Household")
-
-plt.ylabel("Median House Value")
-
-plt.title(
-    "Linear Regression on California Housing Dataset"
-)
-
-
+plt.xlabel("Engine Displacement")
+plt.ylabel("Miles Per Gallon (MPG)")
+plt.title("Polynomial Regression Fit")
 plt.legend()
 
-plt.grid(True)
+plt.savefig(
+    "polynomial_regression.png",
+    dpi=300,
+    bbox_inches="tight"
+)
 
 plt.show()
+```
+
+## RESULT
+
+The Auto MPG dataset was successfully loaded and preprocessed. Linear Regression and Polynomial Regression models of degree 2 and degree 3 were implemented to predict MPG from engine displacement. The models were evaluated using Mean Squared Error (MSE) and R-squared scores.
+
+The results of the three models were compared, and the polynomial regression fit was visualized using a graph showing the actual data points and the degree 2 polynomial regression curve.
+
+Thus, polynomial regression was successfully implemented and compared with linear regression on the Auto MPG dataset.
