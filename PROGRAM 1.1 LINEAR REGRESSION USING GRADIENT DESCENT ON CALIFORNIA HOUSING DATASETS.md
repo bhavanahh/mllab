@@ -144,6 +144,3 @@ plt.show()
 Thus, linear regression was successfully implemented on the California Housing dataset using Gradient Descent and Normal Equation. The model performance was evaluated using MSE and R² score, and the fitted regression line was visualized along with the actual data points.
 """
 
-path = Path("/mnt/data/Linear_Regression_Program_1.md")
-path.write_text(md, encoding="utf-8")
-print(path)
