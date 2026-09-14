@@ -1,7 +1,3 @@
-from pathlib import Path
-
-md = r"""# PROGRAM NO. 1
-
 ## LINEAR REGRESSION
 
 ### AIM
